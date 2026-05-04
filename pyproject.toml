@@ -1,0 +1,18 @@
+[project]
+name = "sagemaker-twitter-sentiment-terraform"
+version = "0.1.0"
+description = "SageMaker Hugging Face Twitter sentiment (Terraform + invoke helper)"
+requires-python = ">=3.12"
+dependencies = [
+    "boto3",
+]
+
+[tool.uv]
+# Managed env: `uv sync` (creates/updates `.venv` from `uv.lock`).
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+only-include = ["invoke_endpoint.py"]

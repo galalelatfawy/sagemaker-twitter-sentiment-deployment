@@ -1,0 +1,9 @@
+# Copy to terraform.tfvars (gitignored) and set your execution role ARN.
+# terraform apply -var-file=terraform.tfvars
+
+aws_region            = "us-east-1"
+execution_role_arn    = "arn:aws:iam::123456789012:role/your-sagemaker-execution-role"
+name_prefix           = "twitter-sentiment-hf"
+# instance_type         = "ml.g6.2xlarge"
+# hf_model_id          = "cardiffnlp/twitter-roberta-base-sentiment-latest"
+# hf_task              = "text-classification"

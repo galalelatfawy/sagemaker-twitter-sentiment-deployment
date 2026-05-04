@@ -1,0 +1,8 @@
+# Optional: copy to backend.hcl, fill in values, then:
+#   terraform init -backend-config=backend.hcl
+# Use a private S3 bucket for state when more than one person or CI applies the same stack.
+
+bucket         = "my-terraform-state-bucket"
+key            = "sagemaker-twitter-sentiment-terraform/terraform.tfstate"
+region         = "us-east-1"
+# dynamodb_table = "terraform-locks" # optional: S3 state locking

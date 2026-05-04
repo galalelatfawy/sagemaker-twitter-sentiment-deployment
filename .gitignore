@@ -1,0 +1,26 @@
+.cursor/
+.venv/
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+.env
+.env.*
+!.env.example
+.DS_Store
+*.egg-info/
+dist/
+build/
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.*.log
+override.tf
+*_override.tf
+.terraform.rc
+terraform.rc
+terraform.tfvars
+*.tfvars
+!*.tfvars.example

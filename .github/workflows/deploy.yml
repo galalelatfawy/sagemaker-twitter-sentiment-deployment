@@ -1,0 +1,60 @@
+# Apply Terraform to create SageMaker model, endpoint configuration, and endpoint.
+#
+# Authentication: GitHub OIDC → AWS IAM role (no static AWS access keys).
+# Repository Secrets / Variables: see README.md and .github/DEPLOYMENT.md
+
+name: Deploy SageMaker (Terraform)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      AWS_REGION: ${{ vars.AWS_REGION != '' && vars.AWS_REGION || 'us-east-1' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_wrapper: false
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+          role-session-name: gh-actions-tf-sagemaker-${{ github.run_id }}
+
+      - name: Terraform Init
+        working-directory: terraform
+        run: terraform init -input=false
+
+      - name: Terraform Apply
+        working-directory: terraform
+        env:
+          TF_VAR_execution_role_arn: ${{ secrets.SAGEMAKER_EXECUTION_ROLE_ARN }}
+          TF_VAR_aws_region: ${{ env.AWS_REGION }}
+        run: terraform apply -auto-approve -input=false
+
+      - name: Smoke invoke (optional)
+        working-directory: terraform
+        env:
+          AWS_REGION: ${{ env.AWS_REGION }}
+        run: |
+          ENDPOINT=$(terraform output -raw endpoint_name)
+          aws sagemaker-runtime invoke-endpoint \
+            --endpoint-name "$ENDPOINT" \
+            --region "$AWS_REGION" \
+            --content-type application/json \
+            --body '{"inputs":"smoke test from GitHub Actions"}' \
+            /tmp/smoke.json
+          cat /tmp/smoke.json
+          echo
